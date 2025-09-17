@@ -1,10 +1,13 @@
-// api/vehicle_models.js
 import fetch from "node-fetch";
 import { js2xml } from "xml-js";
 
 export default async function handler(req, res) {
   try {
-    // Fetch data from Supabase
+    // Check env key exists
+    if (!process.env.SUPABASE_KEY) {
+      return res.status(500).send("<error>Missing SUPABASE_KEY</error>");
+    }
+
     const response = await fetch(
       "https://YOUR_PROJECT.supabase.co/rest/v1/vehicle_models?select=*",
       {
@@ -17,7 +20,14 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Convert JSON into XML with <Vehicle> as root nodes
+    // If Supabase sent an error message
+    if (data.code || data.message) {
+      return res.status(500).send(
+        `<error>Supabase error: ${data.message || "Unknown"}</error>`
+      );
+    }
+
+    // Transform JSON into <Vehicle> list
     const vehicles = data.map((item) => ({
       Vehicle: {
         id: item.id,
@@ -31,9 +41,6 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "application/xml");
     res.status(200).send(xml);
   } catch (error) {
-    res.status(500).send({
-      error: "Failed to fetch data from Supabase",
-      details: error.message,
-    });
+    res.status(500).send(`<error>${error.message}</error>`);
   }
 }
