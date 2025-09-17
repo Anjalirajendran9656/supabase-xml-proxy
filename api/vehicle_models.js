@@ -8,8 +8,9 @@ export default async function handler(req, res) {
       return res.status(500).send("<error>Missing SUPABASE_KEY</error>");
     }
 
-    const response = await fetch(
-      "https://YOUR_PROJECT.supabase.co/rest/v1/vehicle_models?select=*",
+  
+      const response = await fetch("https://djiszadmcjigwrziqvyf.supabase.co/rest/v1/vehicle_models?select=*", {
+
       {
         headers: {
           apikey: process.env.SUPABASE_KEY,
@@ -44,3 +45,4 @@ export default async function handler(req, res) {
     res.status(500).send(`<error>${error.message}</error>`);
   }
 }
+
