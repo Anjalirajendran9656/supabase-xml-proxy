@@ -1,9 +1,9 @@
 // api/vehicle_models.js
-import fetch from "node-fetch";
-import { js2xml } from "xml-js";
+import { js2xml } from "xml-js";   // keep only this import
 
 export default async function handler(req, res) {
   try {
+    // Use built-in fetch (no import needed)
     const response = await fetch(
       "https://djiszadmcjigwrziqvfy.supabase.co/rest/v1/vehicle_models?select=*",
       {
@@ -16,8 +16,11 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Convert JSON → XML
-    const xml = js2xml({ vehicleModels: data }, { compact: true, spaces: 2 });
+    // Wrap into clean XML format
+    const xml = js2xml(
+      { VehicleModels: { Vehicle: data } },
+      { compact: true, spaces: 2 }
+    );
 
     res.setHeader("Content-Type", "application/xml");
     res.status(200).send(xml);
