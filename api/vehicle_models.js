@@ -1,11 +1,12 @@
 // api/vehicle_models.js
-import { js2xml } from "xml-js";   // keep only this import
+import fetch from "node-fetch";
+import { js2xml } from "xml-js";
 
 export default async function handler(req, res) {
   try {
-    // Use built-in fetch (no import needed)
+    // Fetch data from Supabase
     const response = await fetch(
-      "https://djiszadmcjigwrziqvfy.supabase.co/rest/v1/vehicle_models?select=*",
+      "https://YOUR_PROJECT.supabase.co/rest/v1/vehicle_models?select=*",
       {
         headers: {
           apikey: process.env.SUPABASE_KEY,
@@ -16,15 +17,23 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Wrap into clean XML format
-    const xml = js2xml(
-      { VehicleModels: { Vehicle: data } },
-      { compact: true, spaces: 2 }
-    );
+    // Convert JSON into XML with <Vehicle> as root nodes
+    const vehicles = data.map((item) => ({
+      Vehicle: {
+        id: item.id,
+        brand: item.brand,
+        model: item.model,
+      },
+    }));
+
+    const xml = js2xml({ VehicleModels: vehicles }, { compact: true, spaces: 2 });
 
     res.setHeader("Content-Type", "application/xml");
     res.status(200).send(xml);
-  } catch (err) {
-    res.status(500).send(`<error>${err.message}</error>`);
+  } catch (error) {
+    res.status(500).send({
+      error: "Failed to fetch data from Supabase",
+      details: error.message,
+    });
   }
 }
