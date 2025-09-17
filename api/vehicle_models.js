@@ -5,7 +5,7 @@ import { js2xml } from "xml-js";
 export default async function handler(req, res) {
   try {
     const response = await fetch(
-      "https://djiszadmcjigwrziqvyf.supabase.co/rest/v1/vehicle_models?select=*",
+      "https://djiszadmcjigwrziqvfy.supabase.co/rest/v1/vehicle_models?select=*",
       {
         headers: {
           apikey: process.env.SUPABASE_KEY,
@@ -30,3 +30,4 @@ export default async function handler(req, res) {
     res.status(500).send(`<error>${err.message}</error>`);
   }
 }
+
